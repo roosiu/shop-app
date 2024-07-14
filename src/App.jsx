@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import ProductCatalog from './components/ProductCatalog';
 import ShoppingCart from './components/ShoppingCart';
 import AdminOrders from './components/AdminOrders';
 import OrderHistory from './components/OrderHistory';
 import Login from './components/Login';
 import Register from './components/Register';
+import NavBar from './components/NavBar';
 
 const App = () => {
-  const [activeComponent, setActiveComponent] = useState('ProductCatalog');
   const [cartItems, setCartItems] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -60,85 +61,30 @@ const App = () => {
     );
   };
 
-  const renderComponent = () => {
-    switch (activeComponent) {
-      case 'ProductCatalog':
-        return <ProductCatalog addToCart={addToCart} />;
-      case 'ShoppingCart':
-        return <ShoppingCart cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />;
-      case 'OrderHistory':
-        return <OrderHistory />;
-      case 'AdminOrders':
-        return <AdminOrders />;
-      case 'Login':
-        return <Login onLogin={handleLogin} />;
-      case 'Register':
-        return <Register onRegister={handleLogin} />;
-      default:
-        return <ProductCatalog addToCart={addToCart} />;
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-white p-4 shadow-md">
-        <div className="max-w-screen-lg mx-auto flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Mała Doniczka</h1>
-          <nav className="flex items-center space-x-4">
-            <button
-              onClick={() => setActiveComponent('ProductCatalog')}
-              className="text-gray-700 hover:text-green-600"
-            >
-              Produkty
-            </button>
-            <button
-              onClick={() => setActiveComponent('ShoppingCart')}
-              className="text-gray-700 hover:text-green-600"
-            >
-              Koszyk
-            </button>
-            <button
-              onClick={() => setActiveComponent('OrderHistory')}
-              className="text-gray-700 hover:text-green-600"
-            >
-              Historia Zamówień
-            </button>
-            {isAuthenticated ? (
-              <>
-                <span className="text-gray-700">Witaj, {currentUser.username}</span>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-700 hover:text-green-600"
-                >
-                  Wyloguj
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setActiveComponent('Login')}
-                  className="text-gray-700 hover:text-green-600"
-                >
-                  Logowanie
-                </button>
-                <button
-                  onClick={() => setActiveComponent('Register')}
-                  className="text-gray-700 hover:text-green-600"
-                >
-                  Rejestracja
-                </button>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
-      <main className="flex-grow max-w-screen-lg mx-auto p-4">
-        {renderComponent()}
-      </main>
-      <footer className="bg-white p-4 text-center border-t">
-        <p>&copy; 2024 Mała Doniczka</p>
-      </footer>
-    </div>
+    <Router>
+      <div className="min-h-screen flex flex-col">
+        <NavBar
+          isAuthenticated={isAuthenticated}
+          currentUser={currentUser}
+          handleLogout={handleLogout}
+        />
+        <main className="flex-grow max-w-screen-lg mx-auto p-4">
+          <Routes>
+            <Route path="/products" element={<ProductCatalog addToCart={addToCart} />} />
+            <Route path="/cart" element={<ShoppingCart cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />} />
+            <Route path="/order-history" element={<OrderHistory />} />
+            <Route path="/admin-orders" element={<AdminOrders />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/register" element={<Register onRegister={handleLogin} />} />
+            <Route path="/" element={<ProductCatalog addToCart={addToCart} />} />
+          </Routes>
+        </main>
+        <footer className="bg-white p-4 text-center border-t">
+          <p>&copy; 2024 Mała Doniczka</p>
+        </footer>
+      </div>
+    </Router>
   );
 };
 
