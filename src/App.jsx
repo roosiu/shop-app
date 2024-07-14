@@ -16,7 +16,7 @@ const AppContent = () => {
   useEffect(() => {
     const loggedIn = localStorage.getItem('isAuthenticated') === 'true';
     const user = JSON.parse(localStorage.getItem('currentUser'));
-    if (loggedIn && user) {
+    if (loggedIn && user && !user) {
       login(user.username, user.token);
     }
   }, [login]);
