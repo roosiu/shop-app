@@ -9,15 +9,17 @@ import Register from './components/Register';
 import { AuthProvider, useAuth } from './AuthContext';
 import NavBar from './components/NavBar';
 
-const App = () => {
+const AppContent = () => {
   const [cartItems, setCartItems] = useState([]);
-  const { isAuthenticated, currentUser, handleLogin, handleLogout } = useAuth();
+  const { user, login, logout } = useAuth();
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem('isAuthenticated');
-    const user = localStorage.getItem('currentUser');
-    handleLogin(loggedIn === 'true', user ? JSON.parse(user) : null);
-  }, [handleLogin]);
+    const loggedIn = localStorage.getItem('isAuthenticated') === 'true';
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (loggedIn && user) {
+      login(user.username, user.token);
+    }
+  }, [login]);
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -47,13 +49,12 @@ const App = () => {
   };
 
   return (
-    <AuthProvider>
     <Router>
       <div className="min-h-screen flex flex-col">
         <NavBar
-          isAuthenticated={isAuthenticated}
-          currentUser={currentUser}
-          handleLogout={handleLogout}
+          isAuthenticated={user !== null}
+          currentUser={user}
+          handleLogout={logout}
         />
         <main className="flex-grow max-w-screen-lg mx-auto p-4">
           <Routes>
@@ -61,8 +62,8 @@ const App = () => {
             <Route path="/cart" element={<ShoppingCart cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />} />
             <Route path="/order-history" element={<OrderHistory />} />
             <Route path="/admin-orders" element={<AdminOrders />} />
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="/register" element={<Register onRegister={handleLogin} />} />
+            <Route path="/login" element={<Login onLogin={login} />} />
+            <Route path="/register" element={<Register onRegister={login} />} />
             <Route path="/" element={<ProductCatalog addToCart={addToCart} />} />
           </Routes>
         </main>
@@ -71,8 +72,13 @@ const App = () => {
         </footer>
       </div>
     </Router>
-  </AuthProvider>
   );
 };
+
+const App = () => (
+  <AuthProvider>
+    <AppContent />
+  </AuthProvider>
+);
 
 export default App;
