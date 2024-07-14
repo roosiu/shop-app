@@ -6,33 +6,18 @@ import AdminOrders from './components/AdminOrders';
 import OrderHistory from './components/OrderHistory';
 import Login from './components/Login';
 import Register from './components/Register';
+import { AuthProvider, useAuth } from './AuthContext';
 import NavBar from './components/NavBar';
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const { isAuthenticated, currentUser, handleLogin, handleLogout } = useAuth();
 
   useEffect(() => {
     const loggedIn = localStorage.getItem('isAuthenticated');
     const user = localStorage.getItem('currentUser');
-    setIsAuthenticated(loggedIn === 'true');
-    setCurrentUser(user ? JSON.parse(user) : null);
-  }, []);
-
-  const handleLogin = (user) => {
-    setIsAuthenticated(true);
-    setCurrentUser(user);
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('currentUser', JSON.stringify(user));
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setCurrentUser(null);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('currentUser');
-  };
+    handleLogin(loggedIn === 'true', user ? JSON.parse(user) : null);
+  }, [handleLogin]);
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
@@ -62,6 +47,7 @@ const App = () => {
   };
 
   return (
+    <AuthProvider>
     <Router>
       <div className="min-h-screen flex flex-col">
         <NavBar
@@ -85,6 +71,7 @@ const App = () => {
         </footer>
       </div>
     </Router>
+  </AuthProvider>
   );
 };
 
