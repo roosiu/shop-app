@@ -5,7 +5,7 @@ function ProductCatalog({ addToCart }) {
 	const [message, setMessage] = useState('')
 
 	useEffect(() => {
-		fetch('http://localhost:3000/products')
+		fetch('http://localhost:3001/products')
 			.then(response => response.json())
 			.then(data => setProducts(data))
 			.catch(error => console.error('Error fetching products:', error))
@@ -34,10 +34,10 @@ function ProductCatalog({ addToCart }) {
 							className='mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700'>
 							Dodaj do koszyka
 						</button>
-            <div>
-              {message && <div className="message">{message}</div>}
-              {/* Kod wyświetlający produkty */}
-            </div>
+						<div>
+							{message && <div className='message'>{message}</div>}
+							{/* Kod wyświetlający produkty */}
+						</div>
 					</div>
 				))}
 			</div>
